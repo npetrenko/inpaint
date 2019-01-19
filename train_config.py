@@ -1,4 +1,5 @@
 import tensorflow as tf
+
 class TrainConfig:
     def __init__(self, global_step_tensor):
         self.global_step_tensor = global_step_tensor
@@ -19,16 +20,29 @@ class TrainConfig:
         self.dec_BN = True
         self.disc_dropout_during_dec_training = True
 
+        self.latent_dim = 32
+
+        self.loss_type = "scientific"
+        if self.loss_type not in {"scientific", "working"}:
+            raise RuntimeError("Incorrect loss type!")
+
+        self.model_type = "dense"
+        if self.model_type not in {"dense", "conv"}:
+            raise RuntimeError("Incorrect model type!")
+
     def to_string(self):
         train_dic = {"disc_rate": self.disc_rate,
-               "dec_rate": self.dec_rate,
-               "batch_size": self.batch_size,
-               "disc_init_steps": self.disc_init_steps,
-               "dec_init_steps": self.dec_init_steps,
-               "label_noise_rate": self.label_noise_rate,
-               "disc_BN": self.disc_BN,
-               "dec_BN": self.dec_BN,
-               "disc_dropout_during_dec_training": self.disc_dropout_during_dec_training}
+                     "dec_rate": self.dec_rate,
+                     "batch_size": self.batch_size,
+                     "disc_init_steps": self.disc_init_steps,
+                     "dec_init_steps": self.dec_init_steps,
+                     "label_noise_rate": self.label_noise_rate,
+                     "disc_BN": self.disc_BN,
+                     "dec_BN": self.dec_BN,
+                     "latent_dim": self.latent_dim,
+                     "loss_type": self.loss_type,
+                     "model_type": self.model_type,
+                     "disc_dropout_during_dec_training": self.disc_dropout_during_dec_training}
         return str(train_dic)
 
     def update_step_number(self):
