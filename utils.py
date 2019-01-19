@@ -2,9 +2,11 @@ import tensorflow as tf
 import numpy as np
 
 class TBImUploader:
-    def __init__(self, decoder_model, train_config, num_rows):
+    def __init__(self, decoder_model, train_config, num_rows, summary_writer):
+        self.writer = summary_writer
         self.num_rows = num_rows
         self.num_images = num_rows**2
+        self.train_config = train_config
         noise = np.random.normal(size=[self.num_images, train_config.latent_dim]).astype(np.float32)
         
         model_output = decoder_model(tf.constant(noise))
@@ -18,9 +20,9 @@ class TBImUploader:
         exp = tf.expand_dims(exp, 0)
         return exp
     
-    def post_summary(self):
+    def post_summary(self, dec_learning_phase):
         sm = self.summary.eval({dec_learning_phase: False})
-        writer.add_summary(sm, global_step.eval())
+        self.writer.add_summary(sm, self.train_config.global_step_tensor.eval())
 
 def get_new_dir(base_dir, prefix):
     import os
