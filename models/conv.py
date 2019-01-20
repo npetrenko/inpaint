@@ -4,6 +4,10 @@ from .model import Model, AbstractDecoderModel, AbstractDiscriminatorModel
 from tensorflow.keras.layers import UpSampling2D
 
 class DecoderModel(AbstractDecoderModel):
+    def pad(self, num_pad=1):
+        return lambda x: tf.pad(x,
+                                tf.constant([[0,0],[num_pad,num_pad],[num_pad,num_pad],[0,0]]),
+                                mode="SYMMETRIC")
     def __call__(self, inp):
         with tf.variable_scope("decoder", reuse=tf.AUTO_REUSE) as model_scope:
             x = tfl.Dense(9*9*16)(inp)
@@ -13,20 +17,23 @@ class DecoderModel(AbstractDecoderModel):
             x = tf.reshape(x, [-1, 9, 9, 16])
 
             x = UpSampling2D()(x)
-            x = tfl.Conv2D(256, 3, padding="valid")(x)
+            x = tfl.Conv2D(128, 5, padding="valid")(x)
             x = self.batchnorm()(x)
             x = tf.nn.leaky_relu(x)
 
-            x = tfl.Conv2D(128, 3, padding="valid")(x)
+            x = self.pad()(x)
+            x = tfl.Conv2D(64, 3, padding="valid")(x)
             x = self.batchnorm()(x)
             x = tf.nn.leaky_relu(x)
 
             x = UpSampling2D()(x)
-            x = tfl.Conv2D(64, 3, padding="same")(x)
-            x = self.batchnorm()(x)
+
+            x = self.pad()(x)
+            x = tfl.Conv2D(64, 3, padding="valid")(x)
             x = tf.nn.leaky_relu(x)
             
-            x = tfl.Conv2D(1, 3, padding="same")(x)
+            x = self.pad()(x)
+            x = tfl.Conv2D(1, 3, padding="valid")(x)
         
         self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=model_scope.name)
         self.post_call(model_scope)
@@ -43,12 +50,12 @@ class DiscriminatorModel(AbstractDiscriminatorModel):
             x = tfl.Conv2D(128, 3, 2)(x)
             x = self.batchnorm()(x)
             x = tf.nn.leaky_relu(x)
-            x = self.dropout()(x)
+            x = self.dropout(0.25)(x)
 
             x = tfl.Conv2D(256, 3, 2)(x)
             x = self.batchnorm()(x)
             x = tf.nn.leaky_relu(x)
-            x = self.dropout()(x)
+            x = self.dropout(0.25)(x)
             
             x = tfl.Flatten()(x)
             x = tfl.Dense(1, activation=None)(x)

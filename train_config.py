@@ -6,23 +6,23 @@ class TrainConfig:
         self.sess = tf.get_default_session()
         
         self.disc_rate = [1., 1.]
-        self.disc_init_steps = 10000
+        self.disc_init_steps = 3000
         self.is_disc_init = True
         self.batch_size = 64
         
-        self.dec_rate = [1., .7]
-        self.dec_init_steps = 10000
+        self.dec_rate = [.8, .5]
+        self.dec_init_steps = 3000
         self.is_dec_init = True
         
-        self.label_noise_rate = 0.2
+        self.label_noise_rate = 0.1
         
         self.disc_BN = True
-        self.dec_BN = True
+        self.dec_BN = False
         self.disc_dropout_during_dec_training = True
 
         self.latent_dim = 32
 
-        self.loss_type = "scientific"
+        self.loss_type = "working"
         if self.loss_type not in {"scientific", "working"}:
             raise RuntimeError("Incorrect loss type!")
 

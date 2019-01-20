@@ -33,8 +33,8 @@ def build_gan_losses(decoder_model, discriminator_model, true_image_tensor, trai
     
     disc_gain = build_disc_gain()
     
-    disc_input = tf.concat([true_image_tensor, decoder_output], axis=0)
-    disc_output = discriminator_model(disc_input)[num_true:]
+    disc_input = tf.concat([decoder_output, true_image_tensor], axis=0)
+    disc_output = discriminator_model(disc_input)[:num_false]
     false_samples_logp = tf.log(tf.nn.sigmoid(disc_output))    
     dec_gain = tf.reduce_mean(false_samples_logp)
     
