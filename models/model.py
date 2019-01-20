@@ -7,11 +7,11 @@ class Model:
         self.learning_phase = learning_phase
         
     def batchnorm(self):
-        return lambda x: tfl.batch_normalization(x, training=self.learning_phase, momentum=0.5)
+        return lambda x: tfl.batch_normalization(x, training=self.learning_phase)
     
     def post_call(self, model_scope):
-        if not hasattr(self, "summary_scope"):
-            self.summary_scope = model_scope
+        if not hasattr(self, "model_scope"):
+            self.model_scope = model_scope
     
     def dropout(self, rate=0.5):
         return lambda x: tfl.dropout(x, rate=rate, training=self.learning_phase)
@@ -20,11 +20,14 @@ class Model:
         self.summaries += [summ]
         
     def get_merged_summaries(self):
-        with tf.variable_scope(self.summary_scope):
+        with tf.variable_scope(self.model_scope):
             return tf.summary.merge([x() for x in self.summaries])
 
     def get_variables(self):
         return self.variables
+
+    def get_update_ops(self):
+        return tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope=self.model_scope.name)
 
 class AbstractDecoderModel(Model):
     def __init__(self, learning_phase, train_config=None):

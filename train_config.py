@@ -10,14 +10,14 @@ class TrainConfig:
         self.is_disc_init = True
         self.batch_size = 64
         
-        self.dec_rate = [.8, .5]
-        self.dec_init_steps = 3000
+        self.dec_rate = [.8, .4]
+        self.dec_init_steps =3000
         self.is_dec_init = True
         
         self.label_noise_rate = 0.1
         
         self.disc_BN = True
-        self.dec_BN = False
+        self.dec_BN = True
         self.disc_dropout_during_dec_training = True
 
         self.latent_dim = 32
@@ -27,7 +27,7 @@ class TrainConfig:
             raise RuntimeError("Incorrect loss type!")
 
         self.model_type = "conv"
-        if self.model_type not in {"dense", "conv"}:
+        if self.model_type not in {"dense", "conv", "conv_tran"}:
             raise RuntimeError("Incorrect model type!")
 
     def to_string(self):

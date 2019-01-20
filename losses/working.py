@@ -25,7 +25,6 @@ def build_gan_losses(decoder_model, discriminator_model, true_image_tensor, trai
         
         def accuracy(labels, preds):
             tmp = tf.cast(tf.equal(labels, tf.cast(preds, tf.float32)), tf.float32)
-            print(tmp)
             return tf.reduce_mean(tmp)
         
         accuracy = accuracy(labels, tf.nn.sigmoid(disc_logits)>0.5)

@@ -10,11 +10,15 @@ class DecoderModel(AbstractDecoderModel):
                                 mode="SYMMETRIC")
     def __call__(self, inp):
         with tf.variable_scope("decoder", reuse=tf.AUTO_REUSE) as model_scope:
-            x = tfl.Dense(9*9*16)(inp)
+            x = tfl.Dense(11*11*16)(inp)
             x = self.batchnorm()(x)
             x = tf.nn.leaky_relu(x)
 
-            x = tf.reshape(x, [-1, 9, 9, 16])
+            x = tf.reshape(x, [-1, 11, 11, 16])
+
+            x = tfl.Conv2D(32, 3, padding="valid")(x)
+            x = self.batchnorm()(x)
+            x = tf.nn.leaky_relu(x)
 
             x = UpSampling2D()(x)
             x = tfl.Conv2D(128, 5, padding="valid")(x)
